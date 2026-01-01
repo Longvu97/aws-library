@@ -1,0 +1,41 @@
+type Book {
+  id: ID!,
+  type: String!,
+  title: String!,
+  author: String,
+  image: String,
+  createdAt: String!,
+  updatedAt: String!
+}
+
+input BookInput {
+  type: String!,
+  title: String!,
+  author: String,
+  image: String,
+}
+
+type Library {
+  id: ID!,
+  type: String!,
+  name: String!,
+  createdAt: String!,
+  updatedAt: String!
+}
+
+input LibraryInput {
+  type: String!,
+  name: String!,
+}
+
+type Query {
+  listBooks(id: String!): [Book]
+  getBook(id: String!): Book
+  listLibraries(id: String!): [Library]
+  getLibrary(id: String!): Library
+}
+
+type Mutation {
+  createBook(book: BookInput): Book
+  createLibrary(book: LibraryInput): Library
+}
