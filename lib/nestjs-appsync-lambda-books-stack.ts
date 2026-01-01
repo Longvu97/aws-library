@@ -29,7 +29,7 @@ export class NestjsAppsyncLambdaBooksStack extends cdk.Stack {
       definition: Definition.fromFile(path.join(__dirname, './graphql/schema.graphql')),
       authorizationConfig: {
         defaultAuthorization: {
-          authorizationType: AuthorizationType.IAM,
+          authorizationType: AuthorizationType.API_KEY,
         }
       },
       xrayEnabled: true,

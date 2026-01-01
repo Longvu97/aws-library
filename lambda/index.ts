@@ -1,19 +1,17 @@
 import { AppSyncResolverEvent } from 'aws-lambda';
-import { INestApplication } from '@nestjs/common';
+import { INestApplicationContext } from '@nestjs/common';
 
 import { createApp } from 'src/main';
 import { AppSyncDispatcher } from 'src/modules/core/dispatcher';
 
-let cachedApp: INestApplication;
+let cachedApp: INestApplicationContext;
 
-async function bootstrap(): Promise<INestApplication> {
+async function bootstrap(): Promise<INestApplicationContext> {
   if (cachedApp) {
     return cachedApp;
   }
 
   const app = await createApp();
-  await app.init();
-
   cachedApp = app;
 
   return app;
