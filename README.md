@@ -1,9 +1,7 @@
-# NESTJS AWS-CDK DYNAMODB LAMBDA APPSYNC
+# AWS-CDK DYNAMODB APPSYNC
 
-Deploy your NestJS application to AWS Lambda, AppSync, Dynamodb with AWS CDK.
+Deploy application to AWS AppSync, Dynamodb with AWS CDK.
 
 ```bash
-$ cdk boostrap
-
 $ cdk deploy
 ```
