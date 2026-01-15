@@ -1,7 +1,8 @@
 type Book {
-  id: ID!,
-  type: String!,
+  parId: ID!,
+  id: String!,
   title: String!,
+  userId: String!,
   author: String,
   image: String,
   createdAt: String!,
@@ -9,33 +10,50 @@ type Book {
 }
 
 input BookInput {
-  type: String!,
+  libId: String!,
   title: String!,
+  userId: String!,
   author: String,
   image: String,
 }
 
 type Library {
-  id: ID!,
-  type: String!,
+  parId: ID!,
+  id: String!,
   name: String!,
+  userId: String!,
   createdAt: String!,
   updatedAt: String!
 }
 
 input LibraryInput {
-  type: String!,
   name: String!,
+  userId: String!,
 }
 
-type Query {
-  listBooks(id: String!): [Book]
-  getBook(id: String!): Book
-  listLibraries(id: String!): [Library]
-  getLibrary(id: String!): Library
+type LibraryConnection {
+  items: [Library]
+  nextToken: String
+}
+
+type BookConnection {
+  items: [Book]
+  nextToken: String
+}
+
+type Query { 
+  listBooks(parId: String!, nextToken: String): BookConnection
+  getBook(parId: String!, id: String!): Book
+  listLibraries(parId: String!, nextToken: String): LibraryConnection
+  getLibrary(parId: String!, id: String!): Library
 }
 
 type Mutation {
   createBook(book: BookInput): Book
-  createLibrary(book: LibraryInput): Library
+  createLibrary(library: LibraryInput): Library
+}
+
+schema {
+  query: Query,
+  mutation: Mutation
 }

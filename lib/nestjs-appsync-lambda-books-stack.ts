@@ -1,7 +1,7 @@
-import { AuthorizationType, Definition, GraphqlApi } from 'aws-cdk-lib/aws-appsync';
-import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { AuthorizationType, Definition, FunctionRuntime, GraphqlApi, Code } from 'aws-cdk-lib/aws-appsync';
 import { TableV2, AttributeType, Billing } from 'aws-cdk-lib/aws-dynamodb';
 import * as cdk from 'aws-cdk-lib/core';
+
 import { Construct } from 'constructs';
 import path from 'path';
 import { MUTATION_RESOVLERS, QUERY_RESOVLERS } from './resolvers';
@@ -12,17 +12,22 @@ export class NestjsAppsyncLambdaBooksStack extends cdk.Stack {
 
     const table = new TableV2(this, 'MyTable', {
       partitionKey: { 
-        name: 'id', 
+        name: 'parId', 
         type: AttributeType.STRING 
       },
       sortKey: {
-        name: 'type',
+        name: 'id',
         type: AttributeType.STRING
       },
-      tableName: 'book-table',
+      tableName: 'LibraryBookTable',
       billing: Billing.onDemand(),
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
+
+    table.addGlobalSecondaryIndex({
+      indexName: 'ByPartitionId',
+      partitionKey: { name: 'parId', type: AttributeType.STRING },
+    })
 
     const graphqlApi = new GraphqlApi(this, 'GraphQLApi', {
       name: 'BooksApi',
@@ -35,21 +40,16 @@ export class NestjsAppsyncLambdaBooksStack extends cdk.Stack {
       xrayEnabled: true,
     });
 
-    const lambda = new Function(this, 'BookLambda', {
-      runtime: Runtime.NODEJS_22_X,
-      memorySize: 256,
-      code: Code.fromAsset(path.join(__dirname, '../lambda/dist')),
-      handler: 'index.handler',
-      environment: {
-        TABLE_NAME: table.tableName,
-      }
-    });
-
-    const datasource = graphqlApi.addLambdaDataSource('BookLambdaDataSource', lambda);
-
+    const datasource = graphqlApi.addDynamoDbDataSource('BookDynamodbDataSource', table);
+    
     const resolvers = [...QUERY_RESOVLERS, ...MUTATION_RESOVLERS];
-    for (const { id, typeName, fieldName } of resolvers) {
-      datasource.createResolver(id, { typeName, fieldName });
+    for (const { id, typeName, fieldName, pathName } of resolvers) {
+      datasource.createResolver(id, {
+        typeName,
+        fieldName,
+        runtime: FunctionRuntime.JS_1_0_0,
+        code: Code.fromAsset(path.join(__dirname, pathName)),
+      })
     }
   }
 }
